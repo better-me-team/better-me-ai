@@ -1,3 +1,5 @@
 streamlit
 watchdog
 requests
+pandas
+numpy
