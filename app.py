@@ -1,10 +1,8 @@
 import streamlit as st
 import requests
 import json
-import time
+from datetime import datetime
 
-# API_URL = "https://api-inference.huggingface.co/models/mrm8488/t5-base-finetuned-emotion"
-# headers = {"Authorization": f"Bearer {rAplzyQGYLwcFPzUfSqVpGvRdvvXHrmfOitDsopymDDjoxtaOIEfDMeFALNMdDaNuQNIoPZfutTtqBCMlcRsDACtBUoHTsiPFsrQagnPmqyzKbJLAMBBTJTgLNpcvpOZ}"}
 
 def main():
     pages = {
@@ -25,7 +23,8 @@ def main():
                 ("This is your second note, congrats!", "love", "2020-01-02"),
                 ("Note 3", "sadness", "2020-01-03"),
                 ("You see where this is going", "anger", "2020-01-04"),
-            ]
+            ],
+            "placeholder_text": "..."
             
             # Default widget values
             # "text": "",
@@ -36,16 +35,16 @@ def main():
             # "multiselect": ["Hello", "Everyone"],
         })
         
-    page = "Home"
+    # page = "Home"
 
     with st.sidebar:
         st.title("Better.me ©")
-        if st.button("Home"): page = "Home"
-        if st.button("Journal"): page = "Journal"
-        if st.button("Previous Journals"): page = "Previous Journals"
-        if st.button("Analytics"): page = "Analytics"
+        if st.button("Home"): st.session_state.page = "Home"
+        if st.button("Journal"): st.session_state.page = "Journal"
+        if st.button("Previous Journals"): st.session_state.page = "Previous Journals"
+        if st.button("Analytics"): st.session_state.page = "Analytics"
         
-    pages[page]()
+    pages[st.session_state.page]()
 
 
 def page_home():
@@ -53,21 +52,31 @@ def page_home():
 
 
 def page_journal():
+    API_URL = "https://api-inference.huggingface.co/models/mrm8488/t5-base-finetuned-emotion"
+    API_TOKEN = "rAplzyQGYLwcFPzUfSqVpGvRdvvXHrmfOitDsopymDDjoxtaOIEfDMeFALNMdDaNuQNIoPZfutTtqBCMlcRsDACtBUoHTsiPFsrQagnPmqyzKbJLAMBBTJTgLNpcvpOZ"
+    headers = {"Authorization": f"Bearer {API_TOKEN}"}
+    
+    def mood_to_emoji(mood):
+        return {'sadness': '😢', 'joy': '😂', 'fear': '😱', 'anger': '😡', 'disgust': '😤', 'surprise': '😲'}[mood]
+
     def mood_inference(note):
         data = {"inputs": note}
-        response = requests.post(API_URL, json=data, headers=headers)
-        mood = response.json()
-    
-        notes.append(note)
-        pass
+        st.session_state.placeholder_text = note
+        res = requests.post(API_URL, json=data, headers=headers).json()
+        mood = res[0]['generated_text']
+        date = datetime.now()
+        st.info(f"Your mood report -- {mood} {mood_to_emoji(mood)}")
+        # notes.append(note)
+        st.session_state.notes.append((note, mood, f"{date.year}-{date.month}-{date.day}"))
     
     st.write("What's on your mind today?")
-    note = st.text_area("", value="...", max_chars=512, )
+    note = st.text_area("", placeholder=st.session_state.placeholder_text, max_chars=512)
     if st.button("Click here to add note"):
         mood_inference(note)
         
 
 def page_previous_journals():
+    st.title("Previous journals")
 
     mood_box = {
         "anger": st.error,
@@ -82,7 +91,6 @@ def page_previous_journals():
         st.header(date)
         st.write(text)
         mood_box[mood](mood)
-        st.title("Previous journals")
 
     col0, col1, col2 = st.columns(3)
     col_map = {0: col0, 1: col1, 2: col2}
@@ -99,3 +107,73 @@ def page_analytics():
 
 if __name__ == "__main__":
     main()
+
+
+
+# import streamlit as st
+# import requests
+# import json
+# from datetime import datetime
+
+# API_URL = "https://api-inference.huggingface.co/models/mrm8488/t5-base-finetuned-emotion"
+# API_TOKEN = "rAplzyQGYLwcFPzUfSqVpGvRdvvXHrmfOitDsopymDDjoxtaOIEfDMeFALNMdDaNuQNIoPZfutTtqBCMlcRsDACtBUoHTsiPFsrQagnPmqyzKbJLAMBBTJTgLNpcvpOZ"
+# headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
+# notes = []
+
+# def mood_inference(note):
+#     data = {"inputs": note}
+#     res = requests.post(API_URL, json=data, headers=headers).json()
+#     mood = res[0]['generated_text']
+#     st.info(f"Your mood report -- {mood} {mood_to_emoji(mood)}")
+#     notes.append((note, mood, datetime.now()))
+
+# def mood_to_emoji(mood):
+#     return {'sadness': '😢', 'joy': '😂', 'fear': '😱', 'anger': '😡', 'disgust': '😤', 'surprise': '😲'}[mood]
+
+# def update_past_notes():
+#     for i in range(0, len(notes), 3):
+#         col1, col2, col3 = st.columns(3)
+#         with col1:
+#             note, mood, date = notes[i]
+#             with st.container():
+#                 if st.button(f"{date.year}-{date.month}-{date.day} {mood_to_emoji(mood)}"):
+#                     display_note(note)
+
+#         try:
+#             with col2:
+#                 note, mood, date = notes[i+1]
+#                 with st.container():
+#                     if st.button(f"{date.year}-{date.month}-{date.day} {mood_to_emoji(mood)}"):
+#                         display_note(note)
+
+#             with col3:
+#                 note, mood, date = notes[i+2]
+#                 with st.container():
+#                     if st.button(f"{date.year}-{date.month}-{date.day} {mood_to_emoji(mood)}"):
+#                         display_note(note)
+
+#         except IndexError:
+#             pass
+
+
+
+# st.sidebar.title("Better.me ©")
+
+# # heading
+# '''
+# # What's on your mind today?
+# '''
+
+# note = st.text_area("", value="...", max_chars=512)
+# if st.button("Click here to add note"):
+#     mood_inference(note)
+#     update_past_notes()
+
+# '''
+# # View previous notes
+# '''
+
+# def display_note(note):
+#     with st.spinner():
+#         st.container
