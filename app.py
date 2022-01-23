@@ -8,7 +8,7 @@ from random import randint
 import altair as alt
 from collections import Counter
 
-from resources import choose_resources, choose_support
+from resources import choose_resources
 
 
 def main():
@@ -40,10 +40,12 @@ def main():
 
         # FAKE DATA GENERATOR
         mood_list = ["anger", "fear", "joy", "love", "sadness", "surprise"]
-        weights = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 4, 6: 4, 7:4, 8:4, 9:4, 10:4, 11:4, 12:2, 13:2, 14:2, 15:1, 16:3, 16:3, 17:5, 18:1, 19:2 }
+        weights = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4, 10: 4, 11: 4, 12: 2, 13: 2, 14: 2, 15: 1,
+                   16: 3, 16: 3, 17: 5, 18: 1, 19: 2}
         for i in range(100):
-            st.session_state.notes.append(("Test Note: " + str(i), mood_list[weights[randint(0, 19)]], datetime(2021, 1 + ((i//30)%12), 1 + (i%27), 0, 0, 0)))
-        
+            st.session_state.notes.append(("Test Note: " + str(i), mood_list[weights[randint(0, 19)]],
+                                           datetime(2021, 1 + ((i // 30) % 12), 1 + (i % 27), 0, 0, 0)))
+
     # page = "Home"
 
     with st.sidebar:
@@ -58,12 +60,6 @@ def main():
 
 
 def page_home():
-    st.title("🏠 Home")
-
-
-def page_journal():
-    st.title("📝 Journal")
-
     with st.container():
         st.title("Home")
         '''
@@ -97,7 +93,7 @@ def page_journal():
         st.info(f"Your mood report -- {mood} {mood_to_emoji(mood)}")
         # notes.append(note)
         st.session_state.notes.append((note, mood, date))
-        
+
     st.write("What's on your mind today?")
     note = st.text_area("", placeholder=st.session_state.placeholder_text, max_chars=256)
     if st.button("Click here to add note"):
@@ -105,7 +101,7 @@ def page_journal():
 
 
 def page_previous_journals():
-    st.title("📕 Previous Journals")
+    st.title("Previous journals")
 
     mood_box = {
         "anger": st.error,
@@ -135,18 +131,18 @@ def page_previous_journals():
 
 def page_analytics():
     st.title("📊 Analytics")
-    
+
     col0, col1 = st.columns(2)
-    
+
     counter = Counter(map(lambda x: x[1], st.session_state.get("notes", [])))
     mood_list = ["anger", "fear", "joy", "love", "sadness", "surprise"]
     mood_colors = ["red", "yellow", "green", "pink", "blue", "white"]
-    
+
     mood_counts = pd.DataFrame({
         'Moods': mood_list,
         'Counts': [counter[mood] for mood in mood_list]
     })
-    
+
     def mood_bar_graph():
         mood_counts_graph = alt.Chart(mood_counts).mark_bar().encode(
             x='Moods',
@@ -155,51 +151,50 @@ def page_analytics():
         )
 
         st.altair_chart(
-            mood_counts_graph, 
+            mood_counts_graph,
             use_container_width=True,
         )
-        
+
     def mood_pie_graph():
         mood_counts_graph = alt.Chart(mood_counts).mark_arc().encode(
             theta=alt.Theta(field="Counts", type="quantitative"),
             color=alt.Color('Moods', scale=alt.Scale(domain=mood_list, range=mood_colors))
         )
-        
+
         st.altair_chart(
             mood_counts_graph,
             use_container_width=True,
         )
-        
+
     earliest_date = min(map(lambda x: x[2], st.session_state.get("notes", [])))
     latest_date = max(map(lambda x: x[2], st.session_state.get("notes", [])))
     date_iterator = pd.date_range(earliest_date, latest_date, freq='W')
-    
+
     line_graph_frequencies = []
-    for date in date_iterator:    
+    for date in date_iterator:
         line_graph_frequencies.append([0, 0, 0, 0, 0, 0])
         for note in st.session_state.get("notes", []):
             if note[2].date() <= date:
                 line_graph_frequencies[-1][mood_list.index(note[1])] += 1
-    for i in range(len(line_graph_frequencies) -1, 0, -1):
+    for i in range(len(line_graph_frequencies) - 1, 0, -1):
         for j in range(6):
-            line_graph_frequencies[i][j] -= line_graph_frequencies[i-1][j]
-            
+            line_graph_frequencies[i][j] -= line_graph_frequencies[i - 1][j]
+
     def mood_line_graph():
         mood_line_graph = pd.DataFrame(
             line_graph_frequencies,
             columns=mood_list
-        ) 
-        
+        )
+
         st.line_chart(mood_line_graph)
 
-    with col0: 
+    with col0:
         mood_bar_graph()
 
     with col1:
         mood_pie_graph()
-        
+
     mood_line_graph()
-        
 
     # with col0:
     #     start_year = st.selectbox("Start Year", [2021, 2022])
@@ -208,16 +203,19 @@ def page_analytics():
     # with col1:
     #     end_year = st.selectbox("End Year", [2021, 2022])
     #     end_day = st.slider("End Day", 0, 365)
-    
+
 
 def page_resources():
-    st.title("📚 Recommended Resources")
+
+    st.title("Resources")
     col1, col2, col3 = st.columns(3)
 
     # TODO: Change based on analytics page
     mood = "anger"
 
-    p1, p2, p3 = choose_resources(mood), choose_resources(mood), choose_resources(mood)
+    p1 = choose_resources(mood)
+    p2 = choose_resources(mood)
+    p3 = choose_resources(mood)
 
     with col1:
         st.header(p1.title)
@@ -233,27 +231,6 @@ def page_resources():
         st.header(p3.title)
         st.write(p3.description)
         st.markdown("<a href=\"p3.url\"> Learn More </a>", unsafe_allow_html=True)
-
-    st.markdown("---")
-    st.title("Recommended Support")
-
-    col4, col5, col6 = st.columns(3)
-    s1, s2, s3 = choose_support(0), choose_support(1), choose_support(2)
-    with col4:
-        st.header(s1.title)
-        st.write(s1.description)
-        st.markdown("<a href=\"s1.url\"> Learn More </a>", unsafe_allow_html=True)
-
-    with col5:
-        st.header(s2.title)
-        st.write(s2.description)
-        st.markdown("<a href=\"s1.url\"> Learn More </a>", unsafe_allow_html=True)
-
-    with col6:
-        st.header(s3.title)
-        st.write(s3.description)
-        st.markdown("<a href=\"s3.url\"> Learn More </a>", unsafe_allow_html=True)
-
 
 if __name__ == "__main__":
     main()
