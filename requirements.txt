@@ -1,5 +1,6 @@
-streamlit
+streamlit~=1.4.0
 watchdog
-requests
-pandas
-numpy
+requests~=2.27.1
+pandas~=1.4.0
+numpy~=1.22.1
+altair~=4.2.0

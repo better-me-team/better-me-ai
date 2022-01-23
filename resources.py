@@ -1,18 +1,19 @@
 from links import *
 import random
 
+
 class Resource:
     def __init__(self, title, description, url):
         self.title = title
         self.description = description
         self.url = url
 
+
 class Support:
     def __init__(self, title, description, url):
         self.title = title
         self.description = description
         self.url = url
-
 
 
 def choose_resources(mood, ammount):
@@ -38,6 +39,7 @@ def choose_resources(mood, ammount):
         Resource(resources[num][0], resources[num][1], resources[num][2])
         for num in nums
     ]
+
 
 def choose_support(num):
     supports = (
