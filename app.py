@@ -7,7 +7,11 @@ import numpy as np
 from random import randint
 import altair as alt
 from collections import Counter
-import time
+import plotly.express as px
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
+
 from resources import choose_resources, choose_support
 
 
@@ -152,8 +156,6 @@ def page_previous_journals():
 def page_analytics():
     st.title("📊 Analytics")
 
-    col0, col1 = st.columns(2)
-
     counter = Counter(map(lambda x: x[1], st.session_state.get("notes", [])))
     mood_list = ["anger", "fear", "joy", "love", "sadness", "surprise"]
     mood_colors = ["red", "yellow", "green", "pink", "blue", "white"]
@@ -163,28 +165,11 @@ def page_analytics():
         'Counts': [counter[mood] for mood in mood_list]
     })
 
-    def mood_bar_graph():
-        mood_counts_graph = alt.Chart(mood_counts).mark_bar().encode(
-            x='Moods',
-            y='Counts',
-            color=alt.Color('Moods', scale=alt.Scale(domain=mood_list, range=mood_colors))
-        )
-
-        st.altair_chart(
-            mood_counts_graph,
-            use_container_width=True,
-        )
-
-    def mood_pie_graph():
-        mood_counts_graph = alt.Chart(mood_counts).mark_arc().encode(
-            theta=alt.Theta(field="Counts", type="quantitative"),
-            color=alt.Color('Moods', scale=alt.Scale(domain=mood_list, range=mood_colors))
-        )
-
-        st.altair_chart(
-            mood_counts_graph,
-            use_container_width=True,
-        )
+    fig = make_subplots(rows=1, cols=2, subplot_titles=("Mood count -- bar", "Mood count -- pie"), specs=[[{"type": "xy"}, {"type": "domain"}]], horizontal_spacing=0.1)
+    fig.add_trace(go.Bar(x=mood_counts['Moods'], y=mood_counts['Counts']), row=1, col=1)
+    fig.add_trace(go.Pie(values=mood_counts['Counts'], labels=mood_counts['Moods']), row=1, col=2)
+    fig.layout.update(width=800, margin=dict(l=0))
+    st.write(fig)
 
     earliest_date = min(map(lambda x: x[2], st.session_state.get("notes", [])))
     latest_date = max(map(lambda x: x[2], st.session_state.get("notes", [])))
@@ -200,29 +185,14 @@ def page_analytics():
         for j in range(6):
             line_graph_frequencies[i][j] -= line_graph_frequencies[i - 1][j]
 
-    def mood_line_graph():
-        mood_line_graph = pd.DataFrame(
-            line_graph_frequencies,
-            columns=mood_list
-        )
-
-        st.line_chart(mood_line_graph)
-
-    with col0:
-        mood_bar_graph()
-
-    with col1:
-        mood_pie_graph()
-
-    mood_line_graph()
-
-    # with col0:
-    #     start_year = st.selectbox("Start Year", [2021, 2022])
-    #     start_day = st.slider("Start Day", 0, 365)
-    #     
-    # with col1:
-    #     end_year = st.selectbox("End Year", [2021, 2022])
-    #     end_day = st.slider("End Day", 0, 365)
+    mood_line_graph = pd.DataFrame(
+        line_graph_frequencies,
+        columns=mood_list
+    )
+    mood_line_graph['Weeks'] = range(1, len(line_graph_frequencies)+1)
+    fig = px.line(mood_line_graph, x='Weeks', y=mood_list)
+    fig.layout.update(width=800, margin=dict(l=0))
+    st.write(fig)
 
 
 def page_resources():
