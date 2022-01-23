@@ -52,10 +52,21 @@ def main():
 
 
 def page_home():
-    st.title("Home")
+    with st.container():
+        st.title("Home")
+        '''
+        ##### Welcome to Better.Me. Please login below to access your personal AI powered diary.
+        '''
+        username = st.text_input('Username')
+        password = st.text_input('Password')
+        if st.button('Login'):
+            st.session_state.page = "Journal"
+            page_journal()
+        st.write('Not a member? Sign up here')
 
 
 def page_journal():
+    st.title("Write a note")
     API_URL = "https://api-inference.huggingface.co/models/mrm8488/t5-base-finetuned-emotion"
     API_TOKEN = "rAplzyQGYLwcFPzUfSqVpGvRdvvXHrmfOitDsopymDDjoxtaOIEfDMeFALNMdDaNuQNIoPZfutTtqBCMlcRsDACtBUoHTsiPFsrQagnPmqyzKbJLAMBBTJTgLNpcvpOZ"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
