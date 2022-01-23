@@ -10,7 +10,7 @@ anger_resources = (
 )
 
 fear_resources = (
-    ("How to overcome fear and anxiety",
+    ("How to overcome anxiety",
      "How to overcome fear and anxiety is a website that teaches you how to overcome fear and anxiety",
      "https://www.nhsinform.scot/healthy-living/mental-wellbeing/fears-and-phobias/ten-ways-to-fight-your-fears"),
     ("Breathign techniques", "Try these breathing techniques to calm your mind",
