@@ -7,6 +7,7 @@ import numpy as np
 from random import randint
 import altair as alt
 from collections import Counter
+import time
 
 from resources import choose_resources, choose_support
 
@@ -82,7 +83,7 @@ def page_journal():
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
     def mood_to_emoji(mood):
-        return {'sadness': '😢', 'joy': '😂', 'fear': '😱', 'anger': '😡', 'disgust': '😤', 'surprise': '😲'}[mood]
+        return {'sadness': '😢', 'joy': '😂', 'fear': '😱', 'anger': '😡', 'love': '😍', 'surprise': '😲'}[mood]
 
     def mood_inference(note):
         data = {"inputs": note}
@@ -93,11 +94,32 @@ def page_journal():
         st.info(f"Your mood report -- {mood} {mood_to_emoji(mood)}")
         # notes.append(note)
         st.session_state.notes.append((note, mood, date))
+        return mood
 
     st.write("What's on your mind today?")
     note = st.text_area("", placeholder=st.session_state.placeholder_text, max_chars=256)
     if st.button("Click here to add the note"):
-        mood_inference(note)
+        mood = mood_inference(note)
+        while not mood: time.sleep(1)
+
+        with st.container():
+            p1, p2, p3 = choose_resources(mood, 3)
+            c1, c2, c3 = st.columns(3)
+            with c1: 
+                st.header(p1.title)
+                st.write(p1.description)
+                st.markdown("<a href=\"p1.url\"> Learn More </a>", unsafe_allow_html=True)
+
+            with c2: 
+                st.header(p2.title)
+                st.write(p2.description)
+                st.markdown("<a href=\"p2.url\"> Learn More </a>", unsafe_allow_html=True)
+
+            with c3:
+                st.header(p3.title)
+                st.write(p3.description)
+                st.markdown("<a href=\"p3.url\"> Learn More </a>", unsafe_allow_html=True)
+ 
 
 
 def page_previous_journals():
@@ -212,9 +234,7 @@ def page_resources():
     # TODO: Change based on analytics page
     mood = "anger"
 
-    p1 = choose_resources(mood)
-    p2 = choose_resources(mood)
-    p3 = choose_resources(mood)
+    p1, p2, p3 = choose_resources(mood, 3)
 
     with col1:
         st.header(p1.title)

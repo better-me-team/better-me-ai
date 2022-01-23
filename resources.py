@@ -15,7 +15,7 @@ class Support:
 
 
 
-def choose_resources(mood):
+def choose_resources(mood, ammount):
     # choose a random resource from the list of resources
     if mood == "anger":
         resources = anger_resources
@@ -30,10 +30,14 @@ def choose_resources(mood):
     elif mood == "surprise":
         resources = surprise_resources
 
-    # random number between 0 and 4
-    num = random.randint(0, 4)
+    nums = set()
+    while len(nums) < 3:
+        nums.add(random.randint(0, 4))
 
-    return Resource(resources[num][0], resources[num][1], resources[num][2])
+    return [
+        Resource(resources[num][0], resources[num][1], resources[num][2])
+        for num in nums
+    ]
 
 def choose_support(num):
     supports = (
