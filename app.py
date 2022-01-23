@@ -252,6 +252,5 @@ def page_resources():
         st.markdown("<a href=\"s3.url\"> Learn More </a>", unsafe_allow_html=True)
 
 
-
 if __name__ == "__main__":
     main()
