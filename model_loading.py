@@ -50,7 +50,7 @@ class SuicideDetectionClassifier(pl.LightningModule):
 
 def load_model(path):
     # return model
-    pass
+    return pt.load("./model.pt")
 
 
 def pred(text: str, model):
