@@ -72,9 +72,11 @@ def page_journal():
         '''
         username = st.text_input('Username')
         password = st.text_input('Password')
+        
         if st.button('Login'):
             st.session_state.page = "Journal"
-            page_journal()
+            # page_journal()
+
         st.write('Not a member? Sign up here')
 
 
@@ -121,12 +123,14 @@ def page_previous_journals():
         st.write(text)
         mood_box[mood](mood)
 
-    col0, col1, col2 = st.columns(3)
-    col_map = {0: col0, 1: col1, 2: col2}
-
-    for i, note in enumerate(st.session_state.get("notes", [])):
-        with col_map[i % 3]:
-            sample_journal(note)
+    for i in range(0, len(st.session_state.notes), 3):
+        with st.container():
+            col0, col1, col2 = st.columns(3)
+            col_map = {0: col0, 1: col1, 2: col2}
+            for j in range(i, i+3):
+                with col_map[j % 3]:
+                    sample_journal(st.session_state.notes[j])
+            
             st.markdown('---')
 
 
