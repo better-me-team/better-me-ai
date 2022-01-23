@@ -65,8 +65,7 @@ def page_journal():
     st.title("📝 Journal")
 
     with st.container():
-        st.title("Home
-                 ")
+        st.title("Home")
         '''
         ##### Welcome to Better.Me. Please login below to access your personal AI powered diary.
         '''
