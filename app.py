@@ -8,7 +8,7 @@ from random import randint
 import altair as alt
 from collections import Counter
 
-from resources import choose_resources
+from resources import choose_resources, choose_support
 
 
 def main():
@@ -49,7 +49,7 @@ def main():
     # page = "Home"
 
     with st.sidebar:
-        st.title("Better.me ©")
+        st.title("better.me 😄")
         if st.button("Home"): st.session_state.page = "Home"
         if st.button("Journal"): st.session_state.page = "Journal"
         if st.button("Previous Journals"): st.session_state.page = "Previous Journals"
@@ -61,13 +61,13 @@ def main():
 
 def page_home():
     with st.container():
-        st.title("Home")
+        st.title("🏠 Home")
         '''
         ##### Welcome to Better.Me. Please login below to access your personal AI powered diary.
         '''
         username = st.text_input('Username')
         password = st.text_input('Password')
-        
+
         if st.button('Login'):
             st.session_state.page = "Journal"
             # page_journal()
@@ -76,7 +76,7 @@ def page_home():
 
 
 def page_journal():
-    st.title("Write a note")
+    st.title("📝 Write a note")
     API_URL = "https://api-inference.huggingface.co/models/mrm8488/t5-base-finetuned-emotion"
     API_TOKEN = "rAplzyQGYLwcFPzUfSqVpGvRdvvXHrmfOitDsopymDDjoxtaOIEfDMeFALNMdDaNuQNIoPZfutTtqBCMlcRsDACtBUoHTsiPFsrQagnPmqyzKbJLAMBBTJTgLNpcvpOZ"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
@@ -96,12 +96,12 @@ def page_journal():
 
     st.write("What's on your mind today?")
     note = st.text_area("", placeholder=st.session_state.placeholder_text, max_chars=256)
-    if st.button("Click here to add note"):
+    if st.button("Click here to add the note"):
         mood_inference(note)
 
 
 def page_previous_journals():
-    st.title("Previous journals")
+    st.title("📕 Previous journals")
 
     mood_box = {
         "anger": st.error,
@@ -122,10 +122,10 @@ def page_previous_journals():
         with st.container():
             col0, col1, col2 = st.columns(3)
             col_map = {0: col0, 1: col1, 2: col2}
-            for j in range(i, i+3):
+            for j in range(i, i + 3):
                 with col_map[j % 3]:
                     sample_journal(st.session_state.notes[j])
-            
+
             st.markdown('---')
 
 
@@ -206,8 +206,7 @@ def page_analytics():
 
 
 def page_resources():
-
-    st.title("Resources")
+    st.title("📚 Resources")
     col1, col2, col3 = st.columns(3)
 
     # TODO: Change based on analytics page
@@ -231,6 +230,28 @@ def page_resources():
         st.header(p3.title)
         st.write(p3.description)
         st.markdown("<a href=\"p3.url\"> Learn More </a>", unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.title("Recommended Support")
+
+    col4, col5, col6 = st.columns(3)
+    s1, s2, s3 = choose_support(0), choose_support(1), choose_support(2)
+    with col4:
+        st.header(s1.title)
+        st.write(s1.description)
+        st.markdown("<a href=\"s1.url\"> Learn More </a>", unsafe_allow_html=True)
+
+    with col5:
+        st.header(s2.title)
+        st.write(s2.description)
+        st.markdown("<a href=\"s1.url\"> Learn More </a>", unsafe_allow_html=True)
+
+    with col6:
+        st.header(s3.title)
+        st.write(s3.description)
+        st.markdown("<a href=\"s3.url\"> Learn More </a>", unsafe_allow_html=True)
+
+
 
 if __name__ == "__main__":
     main()
