@@ -26,7 +26,25 @@ def main():
             "page": "Home",
 
             # Notes already made for demo
-            "notes": [],
+            "notes": [
+                ("Today I woke up, and didnt want to get out of bed. I just sort of laied there. This made me feel bad.", "sadness", datetime(2020, 12, 15)),
+                ("This afternoon, I ate a big meal. This made me feel good, I would like to eat more.", "joy", datetime(2020, 12, 15)),
+                ("It was hard for me to sleep yesterday, I had a girl on my mind.", "love", datetime(2020, 12, 16)),
+                ("This morning, I got up before my alarm. I was excited to get out of bed!", "joy", datetime(2020, 12, 16)),
+                ("Uber gave me a free meal today. I wonder why.", "surprise", datetime(2020, 12, 16)),
+                ("I couldnt fall asleap yesterday. I just stared at the cealing.", "anger", datetime(2020, 12, 17)),
+                ("This morning I woke up with a horrible hedache. Motrin didn't help.", "anger", datetime(2020, 12, 17)),
+                ("I havent written a post recently. Its a good habit I should get back into.", "anger", datetime(2020, 12, 20)),
+                ("WHY AM I SO STUPID. I failed a quiz today.", "anger", datetime(2020, 12, 21)),
+                ("I cant stop thinking about that quiz. I studied so hard.", "sadness", datetime(2020, 12, 21)),
+                ("Quiz still on my mind...", "sadness", datetime(2020, 12, 21)),
+                ("I finally understand the material for my class!", "joy", datetime(2020, 12, 22)),
+                ("Today was a beautiful day", "joy", datetime(2020, 12, 22)),
+                ("I look forward to tomorrow", "joy", datetime(2020, 12, 22)),
+                ("I spoke to a girl today", "love", datetime(2020, 12, 24)),
+                ("I cant decide weather or not to message her...", "love", datetime(2020, 12, 24)),
+                ("What a day", "surprise", datetime(2020, 12, 26)),
+            ],
             "placeholder_text": "..."
 
             # Default widget values
@@ -49,7 +67,7 @@ def main():
     # page = "Home"
 
     with st.sidebar:
-        st.title("better.me 😄")
+        st.title("better.me")
         if st.button("🏠     Home"): st.session_state.page = "Home"
         if st.button("📝     Journal"): st.session_state.page = "Journal"
         if st.button("📕     Previous Journals"): st.session_state.page = "Previous Journals"
@@ -121,6 +139,7 @@ def page_journal():
 
 
 def page_previous_journals():
+
     st.title("📕 Previous journals")
 
     mood_box = {
@@ -142,7 +161,7 @@ def page_previous_journals():
         with st.container():
             col0, col1, col2 = st.columns(3)
             col_map = {0: col0, 1: col1, 2: col2}
-            for j in range(i, i + 3):
+            for j in range(i, min(i + 3, len(st.session_state.notes))):
                 with col_map[j % 3]:
                     sample_journal(st.session_state.notes[j])
 
