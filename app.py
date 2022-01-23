@@ -3,6 +3,8 @@ import requests
 import json
 from datetime import datetime
 
+from resources import choose_resources
+
 
 def main():
     pages = {
@@ -10,13 +12,14 @@ def main():
         "Journal": page_journal,
         "Previous Journals": page_previous_journals,
         "Analytics": page_analytics,
+        "Resources": page_resources,
     }
-    
+
     if "page" not in st.session_state:
         st.session_state.update({
             # Default page
             "page": "Home",
-            
+
             # Notes already made for demo
             "notes": [
                 ("This is the first note you have ever made", "joy", "2020-01-01"),
@@ -25,7 +28,7 @@ def main():
                 ("You see where this is going", "anger", "2020-01-04"),
             ],
             "placeholder_text": "..."
-            
+
             # Default widget values
             # "text": "",
             # "slider": 0,
@@ -34,7 +37,7 @@ def main():
             # "selectbox": "Hello",
             # "multiselect": ["Hello", "Everyone"],
         })
-        
+
     # page = "Home"
 
     with st.sidebar:
@@ -43,7 +46,8 @@ def main():
         if st.button("Journal"): st.session_state.page = "Journal"
         if st.button("Previous Journals"): st.session_state.page = "Previous Journals"
         if st.button("Analytics"): st.session_state.page = "Analytics"
-        
+        if st.button("Resources"): st.session_state.page = "Resources"
+
     pages[st.session_state.page]()
 
 
@@ -55,7 +59,7 @@ def page_journal():
     API_URL = "https://api-inference.huggingface.co/models/mrm8488/t5-base-finetuned-emotion"
     API_TOKEN = "rAplzyQGYLwcFPzUfSqVpGvRdvvXHrmfOitDsopymDDjoxtaOIEfDMeFALNMdDaNuQNIoPZfutTtqBCMlcRsDACtBUoHTsiPFsrQagnPmqyzKbJLAMBBTJTgLNpcvpOZ"
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
-    
+
     def mood_to_emoji(mood):
         return {'sadness': '😢', 'joy': '😂', 'fear': '😱', 'anger': '😡', 'disgust': '😤', 'surprise': '😲'}[mood]
 
@@ -68,12 +72,12 @@ def page_journal():
         st.info(f"Your mood report -- {mood} {mood_to_emoji(mood)}")
         # notes.append(note)
         st.session_state.notes.append((note, mood, f"{date.year}-{date.month}-{date.day}"))
-    
+
     st.write("What's on your mind today?")
     note = st.text_area("", placeholder=st.session_state.placeholder_text, max_chars=512)
     if st.button("Click here to add note"):
         mood_inference(note)
-        
+
 
 def page_previous_journals():
     st.title("Previous journals")
@@ -86,6 +90,7 @@ def page_previous_journals():
         "sadness": st.info,
         "surprise": st.success,
     }
+
     def sample_journal(note):
         text, mood, date = note
         st.header(date)
@@ -99,11 +104,39 @@ def page_previous_journals():
         with col_map[i % 3]:
             sample_journal(note)
             st.markdown('---')
-        
+
 
 def page_analytics():
     st.title("Analytics")
-    
+
+
+def page_resources():
+
+    st.title("Resources")
+    col1, col2, col3 = st.columns(3)
+
+    # TODO: Change based on analytics page
+    mood = "anger"
+
+    p1 = choose_resources(mood)
+    p2 = choose_resources(mood)
+    p3 = choose_resources(mood)
+
+    with col1:
+        st.header(p1.title)
+        st.write(p1.description)
+        st.markdown("<a href=\"p1.url\"> Learn More </a>", unsafe_allow_html=True)
+
+    with col2:
+        st.header(p2.title)
+        st.write(p2.description)
+        st.markdown("<a href=\"p1.url\"> Learn More </a>", unsafe_allow_html=True)
+
+    with col3:
+        st.header(p3.title)
+        st.write(p3.description)
+        st.markdown("<a href=\"p3.url\"> Learn More </a>", unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     main()
