@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import json
-import time
+import datetime
 
 # API_URL = "https://api-inference.huggingface.co/models/mrm8488/t5-base-finetuned-emotion"
 # headers = {"Authorization": f"Bearer {rAplzyQGYLwcFPzUfSqVpGvRdvvXHrmfOitDsopymDDjoxtaOIEfDMeFALNMdDaNuQNIoPZfutTtqBCMlcRsDACtBUoHTsiPFsrQagnPmqyzKbJLAMBBTJTgLNpcvpOZ}"}
@@ -21,23 +21,27 @@ def main():
             
             # Notes already made for demo
             "notes": [
-                ("This is the first note you have ever made", "joy", "2020-01-01"),
-                ("This is your second note, congrats!", "love", "2020-01-02"),
-                ("Note 3", "sadness", "2020-01-03"),
-                ("You see where this is going", "anger", "2020-01-04"),
-            ]
+                ("This is the first note you have ever made", "joy", datetime.datetime(2020, 1, 1, 0, 0)),
+                ("This is your second note, congrats!", "love", datetime.datetime(2020, 1, 2, 0, 0)),
+                ("Note 3", "sadness", datetime.datetime(2020, 1, 3, 0, 0)),
+                ("You see where this is going", "anger", datetime.datetime(2020, 1, 4, 0, 0)),
+            ],
+            
+            # Some user data that we would eventually manage with backend
+            # user_data": {
+            #     "name": "Users name",
+            #     "Created_Date": "2020-01-01",
+            # }
             
             # Default widget values
             # "text": "",
-            # "slider": 0,
+            "start_year": 2021,
             # "checkbox": False,
             # "radio": "Hello",
             # "selectbox": "Hello",
             # "multiselect": ["Hello", "Everyone"],
         })
         
-    page = "Home"
-
     with st.sidebar:
         st.title("Better.me ©")
         if st.button("Home"): page = "Home"
@@ -45,7 +49,7 @@ def main():
         if st.button("Previous Journals"): page = "Previous Journals"
         if st.button("Analytics"): page = "Analytics"
         
-    pages[page]()
+    pages[st.session_state.page]()
 
 
 def page_home():
@@ -79,7 +83,7 @@ def page_previous_journals():
     }
     def sample_journal(note):
         text, mood, date = note
-        st.header(date)
+        st.header(date.date())
         st.write(text)
         mood_box[mood](mood)
         st.title("Previous journals")
@@ -95,6 +99,17 @@ def page_previous_journals():
 
 def page_analytics():
     st.title("Analytics")
+    col0, col1 = st.columns(2)
+    
+    with col0:
+        st.selectbox("Start year", range(2021, 2022), key="start_year")
+        start_day = st.slider("Start day", 0, 365)
+
+    with col1:
+        end_year = st.selectbox("End year", range(2021, 2022))
+        end_day = st.slider("End day", 0, 365)
+    
+
     
 
 if __name__ == "__main__":
