@@ -4,6 +4,14 @@ from transformers import BertTokenizer, BertForSequenceClassification
 import numpy as np
 import pandas as pd
 
+try:
+    from torch.hub import load_state_dict_from_url
+except ImportError:
+    from torch.utils.model_zoo import load_url as load_state_dict_from_url
+
+model_urls = dict(
+    params='https://github.com/better-me-team/better.me/releases/download/model_params/model.pt',
+)
 
 class SuicideDataset(Dataset):
     def __init__(self, dataset):
@@ -47,11 +55,9 @@ class SuicideDetectionClassifier(pl.LightningModule):
         optimizer = pt.optim.Adam(self.parameters(), lr=1e-5)
         return optimizer
 
-
-def load_model(path):
-    # return model
-    return pt.load("./model.pt")
-
+def load_model(path=params, progress=True):
+    model_state = load_state_dict_from_url(model_urls.get(path), progress=progress)
+    return model_state
 
 def pred(text: str, model):
     tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
