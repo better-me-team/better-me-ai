@@ -11,6 +11,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
+
 from resources import choose_resources, choose_support
 
 
@@ -53,11 +54,11 @@ def main():
 
     with st.sidebar:
         st.title("better.me 😄")
-        if st.button("Home"): st.session_state.page = "Home"
-        if st.button("Journal"): st.session_state.page = "Journal"
-        if st.button("Previous Journals"): st.session_state.page = "Previous Journals"
-        if st.button("Analytics"): st.session_state.page = "Analytics"
-        if st.button("Resources"): st.session_state.page = "Resources"
+        if st.button("🏠     Home"): st.session_state.page = "Home"
+        if st.button("📝     Journal"): st.session_state.page = "Journal"
+        if st.button("📕     Previous Journals"): st.session_state.page = "Previous Journals"
+        if st.button("📊     Analytics"): st.session_state.page = "Analytics"
+        if st.button("📚     Recommendations"): st.session_state.page = "Resources"
 
     pages[st.session_state.page]()
 
@@ -85,7 +86,7 @@ def page_journal():
     headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
     def mood_to_emoji(mood):
-        return {'sadness': '😢', 'joy': '😂', 'fear': '😱', 'anger': '😡', 'disgust': '😤', 'surprise': '😲'}[mood]
+        return {'sadness': '😢', 'joy': '😂', 'fear': '😱', 'anger': '😡', 'love': '😍', 'surprise': '😲'}[mood]
 
     def mood_inference(note):
         data = {"inputs": note}
@@ -96,11 +97,31 @@ def page_journal():
         st.info(f"Your mood report -- {mood} {mood_to_emoji(mood)}")
         # notes.append(note)
         st.session_state.notes.append((note, mood, date))
+        return mood
 
     st.write("What's on your mind today?")
     note = st.text_area("", placeholder=st.session_state.placeholder_text, max_chars=256)
     if st.button("Click here to add the note"):
-        mood_inference(note)
+        mood = mood_inference(note)
+        while not mood: time.sleep(1)
+
+        with st.container():
+            p1, p2, p3 = choose_resources(mood, 3)
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                st.header(p1.title)
+                st.write(p1.description)
+                st.markdown("[Learn More](%s)" % p1.url, unsafe_allow_html=True)
+
+            with c2:
+                st.header(p2.title)
+                st.write(p2.description)
+                st.markdown("[Learn More](%s)" % p2.url, unsafe_allow_html=True)
+
+            with c3:
+                st.header(p3.title)
+                st.write(p3.description)
+                st.markdown("[Learn More](%s)" % p3.url, unsafe_allow_html=True)
 
 
 def page_previous_journals():
@@ -181,45 +202,43 @@ def page_resources():
     # TODO: Change based on analytics page
     mood = "anger"
 
-    p1 = choose_resources(mood)
-    p2 = choose_resources(mood)
-    p3 = choose_resources(mood)
+    p1, p2, p3 = choose_resources(mood, 3)
 
     with col1:
         st.header(p1.title)
         st.write(p1.description)
-        st.markdown("<a href=\"p1.url\"> Learn More </a>", unsafe_allow_html=True)
+        st.markdown("[Learn More](%s)" % p1.url, unsafe_allow_html=True)
 
     with col2:
         st.header(p2.title)
         st.write(p2.description)
-        st.markdown("<a href=\"p1.url\"> Learn More </a>", unsafe_allow_html=True)
+        st.markdown("[Learn More](%s)" % p2.url, unsafe_allow_html=True)
 
     with col3:
         st.header(p3.title)
         st.write(p3.description)
-        st.markdown("<a href=\"p3.url\"> Learn More </a>", unsafe_allow_html=True)
+        st.markdown("[Learn More](%s)" % p3.url, unsafe_allow_html=True)
 
     st.markdown("---")
     st.title("Recommended Support")
 
     col4, col5, col6 = st.columns(3)
+
     s1, s2, s3 = choose_support(0), choose_support(1), choose_support(2)
     with col4:
         st.header(s1.title)
         st.write(s1.description)
-        st.markdown("<a href=\"s1.url\"> Learn More </a>", unsafe_allow_html=True)
+        st.markdown("[Learn More](%s)" % s1.url, unsafe_allow_html=True)
 
     with col5:
         st.header(s2.title)
         st.write(s2.description)
-        st.markdown("<a href=\"s1.url\"> Learn More </a>", unsafe_allow_html=True)
+        st.markdown("[Learn More](%s)" % s2.url, unsafe_allow_html=True)
 
     with col6:
         st.header(s3.title)
         st.write(s3.description)
-        st.markdown("<a href=\"s3.url\"> Learn More </a>", unsafe_allow_html=True)
-
+        st.markdown("[Learn More](%s)" % s3.url, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
